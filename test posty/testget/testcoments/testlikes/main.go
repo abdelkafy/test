@@ -11,7 +11,7 @@ import (
 
 func main() {
 	client := &http.Client{}
-	url := "http://10.1.4.4:8080/like-post"
+	url := "http://10.1.4.8:8080/like-post"
 
 	for  {
 		title, _ := generatePost()
@@ -29,9 +29,9 @@ func main() {
 		// ✅ Add your session cookie here
 		req.AddCookie(&http.Cookie{
 			Name:  "id",       // change this to match your actual cookie name
-			Value: "d628f958-dd2d-4cb6-8d3a-95ca53b4607a", // replace this with your valid session ID
+			Value: "38296402-003d-4e7c-ad8b-0de754af1f94", // replace this with your valid session ID
 		})
-
+req.Header.Set("X-Forwarded-For", randomIPv4())
 		resp, err := client.Do(req)
 		if err != nil {
 			fmt.Println("Error:", err)
@@ -40,8 +40,11 @@ func main() {
 
 		fmt.Println("Created post:", title)
 		resp.Body.Close()
-		time.Sleep(200 * time.Millisecond)
+		
 	}
+}
+func randomIPv4() string {
+	return fmt.Sprintf("%d.%d.%d.%d", 1+rand.Intn(254), 1+rand.Intn(254), 1+rand.Intn(254), 1+rand.Intn(254))
 }
 
 func generatePost() (string, string) {

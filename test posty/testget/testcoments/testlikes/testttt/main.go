@@ -10,24 +10,30 @@ import (
 )
 
 func main() {
-	url := "http://10.1.4.4:8080/register"
-	for i := 0; i <1000000000000; i++ {
+	url := "http://10.1.4.8:8080/register"
+	client := &http.Client{}
+	for i := 0; i < 1000000000000; i++ {
 		username, email := generate()
-		formData := []byte("username-section=" + username + "&email-section=" + email + "&password-section=" + "abdo1234@" + "&password-checker-section=" + "abdo1234@"+"&register-button=submited")
-		resp, err := http.Post(url, "application/x-www-form-urlencoded", bytes.NewBuffer(formData))
-		fmt.Println(username,"*",email)
+		formData := "username-section=" + username + "&email-section=" + email + "&password-section=" + "abdo1234@" + "&password-checker-section=" + "abdo1234@" + "&register-button=submited"
+		req, _ := http.NewRequest("POST", url, bytes.NewBufferString(formData))
+		req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
+
+		// Generate a random IPv4 and set X-Forwarded-For
+		req.Header.Set("X-Forwarded-For", randomIPv4())
+
+		resp, err := client.Do(req)
 		if err != nil {
-			panic(err)
+			fmt.Println("error:", err)
+			continue
 		}
+		resp.Body.Close()
 		fmt.Println(resp)
-	resp.Body.Close()
-		time.Sleep(200*time.Millisecond)
+
 	}
 }
 
-
 func generate() (string, string) {
-	usernameLength := rand.Intn(8) + 6 
+	usernameLength := rand.Intn(8) + 6
 	emailLength := rand.Intn(8) + 6
 	username := RandomString(usernameLength)
 	email := RandomString(emailLength) + "@gmail.com"
@@ -50,4 +56,8 @@ func RandomString(n int) string {
 	}
 	mu.Unlock()
 	return string(b)
+}
+
+func randomIPv4() string {
+	return fmt.Sprintf("%d.%d.%d.%d", 1+rand.Intn(254), 1+rand.Intn(254), 1+rand.Intn(254), 1+rand.Intn(254))
 }
